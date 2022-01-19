@@ -1,0 +1,66 @@
+USE sakila;
+
+# 1. List all actors.
+SELECT * FROM actor;
+
+# 2. Find the surname of the actor with the forename 'John'.
+SELECT * FROM actor WHERE first_name='John';
+
+# 3. Find all actors with surname 'Neeson'.
+SELECT * FROM actor WHERE last_name='Neeson';
+
+# 4. Find all actors with ID numbers divisible by 10.
+SELECT * FROM actor WHERE actor_id%10 = 0;
+
+# 5. What is the description of the movie with an ID of 100?
+SELECT film_id, title, description FROM film WHERE film_id=100;
+
+# 6. Find every R-rated movie.
+SELECT rating FROM film;
+SELECT film_id, title, rating FROM film WHERE rating='R';
+
+# 7. Find every non-R-rated movie.
+SELECT film_id, title, rating FROM film WHERE NOT rating='R';
+
+# 8. Find the ten shortest movies.
+SELECT film_id, title, length FROM film WHERE length IS NOT NULL ORDER BY length ASC LIMIT 10;
+
+# 9. Find the movies with the longest runtime, without using LIMIT.
+SELECT film_id, title, length FROM film WHERE length IS NOT NULL ORDER BY length DESC;
+
+# 10. Find all movies that have deleted scenes.
+SELECT description, special_features FROM film;
+SELECT film_id, title, special_features FROM film WHERE special_features LIKE 'Deleted Scenes';
+
+# 11. Using HAVING, reverse-alphabetically list the last names that are not repeated.
+SELECT last_name FROM actor GROUP BY last_name HAVING COUNT(last_name)=1 ORDER BY last_name DESC;
+
+# 12 - Using HAVING, list the last names that appear more than once, from highest to lowest frequency.
+SELECT last_name, COUNT(last_name) AS frequency FROM actor 
+GROUP BY last_name 
+HAVING COUNT(last_name)>1 
+ORDER BY frequency DESC;
+
+# 13. Which actor has appeared in the most films?
+SELECT a.actor_id, a.first_name, a.last_name, f.film_id
+FROM actor a
+JOIN film f ON a.actor_id=f.film_id WHERE a.actor_id IS NOT NULL ORDER BY a.actor_id ASC LIMIT 1;
+
+# 14 - When is 'Academy Dinosaur' due?
+WITH academy_dinosaur AS
+(SELECT *
+FROM film
+WHERE title = "Academy Dinosaur")
+SELECT return_date
+FROM rental
+WHERE inventory_id = 1
+ORDER BY return_date DESC
+LIMIT 1;
+
+
+# 16 - List the average runtime for every film category.
+SELECT c.name, avg(f.length) as avgRuntime
+FROM film_category fc
+join film f on fc.film_id=f.film_id
+join category c on fc.category_id=c.category_id
+group by name;
